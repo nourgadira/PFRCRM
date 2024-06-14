@@ -1,0 +1,174 @@
+/* Styles pour le conteneur principal */
+.body-container {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Styles pour le conteneur du formulaire de connexion */
+.login-container {
+    display: flex;
+    width: 900px;
+    height: 500px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Styles pour la section de l'image */
+.login-image-section {
+    flex: 1;
+    background: url('../public/img/login.jpg') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Styles pour la section du formulaire de connexion */
+.login-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Styles pour le formulaire de connexion */
+.login-form-wrapper {
+    width: 80%;
+}
+
+.login-form-wrapper h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #d1d3e2;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #6e707e;
+}
+
+/* Styles pour le bouton de connexion */
+.login-button {
+    background: linear-gradient(to bottom, #2e6bff, #0000ff);
+    /* Dégradé de bleu par défaut */
+    color: white;
+    /* Couleur du texte */
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    /* Transition pour le fond et la couleur du texte */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-button:hover {
+    background: linear-gradient(to bottom, #4287f5, #0b4fd1);
+    /* Gradient bleu au survol */
+    text-decoration: none;
+    /* Supprimer le soulignement au survol */
+}
+
+
+/* Styles pour le message d'erreur */
+.login-error {
+    margin-bottom: 20px;
+    color: red;
+    font-size: 14px;
+}
+
+/* Styles pour le dégradé de couleur en arrière-plan des lettres */
+.login-image-overlay h1 span {
+    display: inline-block;
+    margin: 0 5px;
+    border-radius: 5px;
+    /* Coins arrondis */
+    padding: 5px 10px;
+    font-size: 48px;
+    /* Dégradé linéaire */
+    /*background: linear-gradient(to right, #f5f5f5, #e0e0e0, #d3d3d3);*/
+    background: linear-gradient(to right, #a9bbd3, #c7d4f3);
+    border: 2px solid #ffffff;
+    /* Bordure blanche */
+}
+
+/* Ajoutez ces styles CSS */
+.login-account {
+    display: block;
+    text-align: center;
+    font-family: "Arial", sans-serif;
+    margin-bottom: 20px;
+    font-weight: 600;
+    /* Poids de la police (par exemple, 600 pour semi-gras) */
+    font-style: normal;
+    /* Style d'écriture (par exemple, italique) */
+}
+
+/* Styles pour les alertes */
+.custom-alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #fff;
+    transition: opacity 0.3s;
+}
+
+.success-alert {
+    background-color: #28a745;
+    /* Couleur de fond pour une alerte de succès */
+}
+
+.error-alert {
+    background-color: #dc3545;
+    /* Couleur de fond pour une alerte d'erreur */
+}
+
+/* Animation pour les alertes */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.fade-out {
+    animation: fadeOut 1s ease-out forwards;
+    /* Animation de fondu */
+}
+
+/* Ajoutez ces styles CSS */
+.login-account-container {
+    text-align: center;
+    /* Centre le texte horizontalement */
+    margin-bottom: 20px;
+    /* Ajoute de l'espace en bas */
+}

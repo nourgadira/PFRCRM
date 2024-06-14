@@ -1,0 +1,9 @@
+.bg-login-image {
+    background-image: url('chemin/vers/votre/image/nour123.jpg');
+    background-size: cover;
+  }
+  
+  .my-8 {
+    margin-top: 8rem !important;
+    margin-bottom: 3rem !important;
+}
