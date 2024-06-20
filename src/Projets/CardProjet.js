@@ -18,23 +18,23 @@ export const CardProjet = ({ _id, nom, description, dateDebut, dateFin, coutProj
         },
     });
     const todo = {
-        type: "todo",
+        type: "Tâches à faire",
         value: taches?.filter(d => d.etat === "todo")?.length
     };
 
     const inprogress = {
-        type: "INPROGRESS",
+        type: "Tâches en cours",
         value: taches?.filter(d => d.etat === "INPROGRESS")?.length
     };
 
     const done = {
-        type: "done",
+        type: "Tâches terminées",
         value: taches?.filter(d => d.etat === "done")?.length
     };
 
     return (
         <Card style={{ width: "100%" }}>
-            <Link to={`/projets/${_id}/taches`} style={{ fontWeight: 'bold', fontSize: '24px' }}>{nom}</Link>
+            <Link to={`/projets/${_id}/taches`} style={{ fontWeight: 'bold', fontSize: '24px', textDecoration: 'unset' }}>{nom}</Link>
             <Flex gap={5} style={{ marginTop: '10px' }}>
                 <div className="flex flex-col gap-6">
                     <Typography.Title level={5}>Description: {description}</Typography.Title>

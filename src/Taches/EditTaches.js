@@ -48,33 +48,14 @@ const UpdateTask = ({ setOpen }) => {
     mutationFn: async ({ data }) => {
       const updateData = { ...data };
       await axiosInstance.patch(`/tasks/${id}`, updateData)
-      navigate('/Taches');
+      navigate(`/projets/${updateData.projet._id}/taches`); // Navigation vers l'URL souhaitée après la soumission du formulaire
     },
   })
-
   return (
     <Layout>
       <Card title={<><FolderAddOutlined /> Modifier une tâche</>} className="mb-4">
         <Form layout='vertical' form={form} onFinish={(values) => mutate({ data: values })} className="custom-form">
           {/* Projet */}
-          {(decoded.role === 1 || decoded.role === 2) && (
-            <Form.Item
-              label="Projet"
-              name={['projet', '_id']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez sélectionner un projet',
-                },
-              ]}
-            >
-              <Select
-                loading={projetsLoading}
-                options={projets?.map(p => ({ label: p.nom, value: p._id }))}
-                disabled={decoded.role !== 1} // Désactiver le champ si le rôle n'est pas 1
-              />
-            </Form.Item>
-          )}
 
           {/* État */}
           {(decoded.role === 1 || decoded.role === 2) && (
@@ -101,6 +82,20 @@ const UpdateTask = ({ setOpen }) => {
                 {
                   required: true,
                   message: 'Veuillez saisir un nom',
+                },
+              ]}
+            >
+              <Input suffix={<i className="fas fa-align-left" />} />
+            </Form.Item>
+          )}
+          {(decoded.role === 1) && (
+            <Form.Item
+              label="desciption"
+              name="desciption"
+              rules={[
+                {
+                  required: true,
+                  message: 'Veuillez saisir un desciption',
                 },
               ]}
             >

@@ -1,15 +1,15 @@
 export const $ROLES = [
 
     {
-        name: "chefprojet",
+        name: "Chef de projet",
         key: 2
     },
     {
-        name: "developpeur",
+        name: "Développeur",
         key: 1
     },
     {
-        name: "responsable",
+        name: "Responsable Commercial",
         key: 3
     }
 ]

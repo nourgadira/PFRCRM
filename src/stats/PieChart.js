@@ -22,9 +22,9 @@ export const PieChart = () => {
     const inProgress = tasks?.filter(task => task.etat === "INPROGRESS")?.length
     const config = {
         data: [
-            { type: 'todo', value: todo },
-            { type: 'done', value: done },
-            { type: 'IN_PROGRESS', value: inProgress },
+            { type: 'Tâches à faire', value: todo },
+            { type: 'Tâches terminées', value: done },
+            { type: 'Tâches en cours', value: inProgress },
 
         ],
         angleField: 'value',

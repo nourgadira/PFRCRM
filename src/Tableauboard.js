@@ -41,6 +41,15 @@ const Dashboard = () => {
       return axiosInstance.get('/paiement').then(res => res.data);
     }
   });
+  const { data: avances } = useQuery({
+    queryKey: ['avances'],
+    queryFn: async () => {
+      return axiosInstance.get('/avance').then(res => res.data);
+    }
+  });
+
+  // Vérifier si avances est défini avant de calculer le montant total des avances
+  const totalAvances = avances ? avances.reduce((total, avance) => total + avance.avance, 0) : 0;
 
   const { data: tasks } = useQuery({
     queryKey: ['tasks'],
@@ -74,8 +83,7 @@ const Dashboard = () => {
     return accumulator + Number(currentValue.avance || 0);
   }, 0);
 
-  const percent = totalAmount > 0 ? (paiementAmount / totalAmount) * 100 : 0;
-
+  const percentAvances = (totalAvances / totalAmount) * 100;
   const currentRendezVous = rendezvous?.length > 0 ? new Date(rendezvous[0]?.dateHeure).toLocaleDateString() : "N/A";
 
   return (
@@ -118,7 +126,7 @@ const Dashboard = () => {
                           <Col span={8}>
                             <Card bordered hoverable style={{ background: "#C0C2C9", width: "100%" }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <Typography.Title level={3}>{totalAmount} $</Typography.Title>
+                                <Typography.Title level={3}>Montant total des paiements : {totalAmount} $</Typography.Title>
                                 <img src='/gross.png' style={{ width: "40px" }} />
                               </div>
                             </Card>
@@ -126,7 +134,7 @@ const Dashboard = () => {
                           <Col span={8}>
                             <Card bordered hoverable style={{ background: "#C0C2C9" }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <Typography.Title level={3}>{paiementAmount} $</Typography.Title>
+                                <Typography.Title level={3}>Montant total des avances : {totalAvances} $</Typography.Title>
                                 <img src='/gross.png' style={{ width: "40px" }} />
                               </div>
                             </Card>
@@ -134,10 +142,11 @@ const Dashboard = () => {
                           <Col span={8}>
                             <Card bordered hoverable style={{ background: "#C0C2C9" }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                <Typography.Title level={3}>{Math.round(percent)} %</Typography.Title>
+                                <Typography.Title level={3}>pourcantage des avances:{Math.round(percentAvances)} %</Typography.Title>
                                 <img src='/percent.png' style={{ width: "40px" }} />
                               </div>
                             </Card>
+
                           </Col>
                         </Row>
                       </Col>
@@ -170,11 +179,13 @@ const Dashboard = () => {
           </Row>
         }
         <Row gutter={12} style={{ marginTop: "12px" }}>
-          <Col span={8}>
-            <Card title="Status des taches">
-              <PieChart />
-            </Card>
-          </Col>
+          {
+            decoded?.role !== 3 &&
+            <Col span={8}>
+              <Card title="Status des taches">
+                <PieChart />
+              </Card>
+            </Col>}
           <Col span={16}>
             <Card>
               <Calendrier />

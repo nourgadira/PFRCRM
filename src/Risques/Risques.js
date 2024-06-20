@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Table, message, Card, Button, Popconfirm } from 'antd';
-import { axiosInstance } from '../lib/axios';
 import Layout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { decodeToken } from '../lib/jwt';
 
 const GetAllRisques = () => {
     const navigate = useNavigate();
@@ -18,6 +18,8 @@ const GetAllRisques = () => {
                 return;
             }
 
+            const decoded = decodeToken(token);
+
             const response = await axios.get('http://localhost:8080/api/risque', {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -27,10 +29,20 @@ const GetAllRisques = () => {
                 }
             });
 
-            setRisques(response.data);
+            let data = response.data;
+            if (decoded.role !== 0) { // Assuming role 0 is for admin
+                data = data.filter(risque =>
+                    risque.projet &&
+                    risque.projet.chefProjet &&
+                    risque.projet.chefProjet._id === decoded.id
+                );
+            }
+
+            setRisques(data);
             setLoading(false);
         } catch (error) {
-            console.error('Erreur lors de la récupération des paiements:', error);
+            console.error('Erreur lors de la récupération des risques:', error);
+            message.error('Erreur lors de la récupération des risques.');
         }
     };
 
@@ -66,9 +78,10 @@ const GetAllRisques = () => {
             });
 
             message.success('Le risque a été supprimé avec succès.');
-            fetchRisques(); // Rechargez la liste après la suppression
+            fetchRisques(); // Reload the list after deletion
         } catch (error) {
             console.error('Erreur lors de la suppression du risque:', error);
+            message.error('Erreur lors de la suppression du risque.');
         }
     };
 
@@ -89,7 +102,6 @@ const GetAllRisques = () => {
             title: 'Niveau',
             dataIndex: 'niveau',
             key: 'niveau',
-
         },
         {
             title: 'Impact',
@@ -101,7 +113,6 @@ const GetAllRisques = () => {
                 </div>
             )
         },
-
         {
             title: "Nom du Projet",
             dataIndex: "projet",

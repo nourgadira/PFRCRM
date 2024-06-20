@@ -111,11 +111,21 @@ const CreateRendezvous = () => {
               rules={[{ required: true, message: 'Veuillez saisir un état' }]}
             >
               <Select placeholder="Sélectionnez l'état du client">
-                <Option value="nouveau">Nouveau</Option>
-                <Option value="prospecter">Prospecter</Option>
+                <Option value="nouveau">joiniabale</Option>
+                <Option value="prospecter">non joiniabale</Option>
               </Select>
             </Form.Item>
+            <Form.Item
+              label="Status"
+              name="Status"
+              rules={[{ required: true, message: 'Veuillez saisirStatus' }]}
+            >
+              <Select placeholder="Sélectionnez le Status du rendezvous">
+                <Option value="À venir">À Fait</Option>
+                <Option value="En cours">En cours</Option>
 
+              </Select>
+            </Form.Item>
 
             <Form.Item
               label="Nom du client"

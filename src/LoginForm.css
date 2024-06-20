@@ -10,6 +10,22 @@
     height: 100vh;
 }
 
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Styles pour le conteneur du formulaire de connexion */
 .login-container {
     display: flex;
@@ -161,7 +177,7 @@
 }
 
 .fade-out {
-    animation: fadeOut 1s ease-out forwards;
+    animation: fadeOut 4s ease-out forwards;
     /* Animation de fondu */
 }
 

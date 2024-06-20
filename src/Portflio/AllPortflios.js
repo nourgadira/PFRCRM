@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Ce import semble inutilisé
-import { axiosInstance } from '../lib/axios'; // De même, il semble inutilisé
-import { Card, Collapse, List, Spin, Alert } from 'antd';
-import { FolderOutlined } from '@ant-design/icons';
+import { axiosInstance } from '../lib/axios';
+import { Card, Collapse, List, Spin, Alert, Typography, Row, Col } from 'antd';
+import { FolderOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Layout from '../Layout';
 
 const { Meta } = Card;
 const { Panel } = Collapse;
+const { Title, Text } = Typography;
 
 const AllPortfolios = () => {
   const [clientsProjects, setClientsProjects] = useState({});
@@ -30,8 +30,8 @@ const AllPortfolios = () => {
         setClientsProjects(projectsByClient);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching projects:', error);
-        setError('An error occurred while fetching projects.');
+        console.error('Erreur lors de la récupération des projets :', error);
+        setError('Une erreur s\'est produite lors de la récupération des projets.');
         setLoading(false);
       }
     };
@@ -46,17 +46,18 @@ const AllPortfolios = () => {
     <List.Item>
       <Card
         hoverable
+        style={{ borderRadius: 8, boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
         actions={[
-          <FolderOutlined key="user" onClick={() => handleClientClick(project._id)} />,
+          <FolderOutlined key="folder" onClick={() => handleClientClick(project._id)} />,
         ]}
       >
         <Meta
           title={project.nom}
           description={
             <>
-              <strong>Coût:</strong> {project.coutProjet}<br />
-              <strong>Date Début:</strong> {dayjs(project.dateDebut).format('YYYY-MM-DD')}<br />
-              <strong>Date Fin:</strong> {dayjs(project.dateFin).format('YYYY-MM-DD')}
+              <Text strong>Coût:</Text> {project.coutProjet}<br />
+              <Text strong>Date Début:</Text> {dayjs(project.dateDebut).format('YYYY-MM-DD')}<br />
+              <Text strong>Date Fin:</Text> {dayjs(project.dateFin).format('YYYY-MM-DD')}
             </>
           }
         />
@@ -68,18 +69,32 @@ const AllPortfolios = () => {
     return Object.keys(clientsProjects).map(clientId => (
       <Panel
         header={
-          <div>
-            <span style={{ fontWeight: '700' }}>{clientsProjects[clientId][0].clientId.nom} {clientsProjects[clientId][0].clientId.prenom}</span>
-            <span style={{ marginLeft: 8 }}>({clientsProjects[clientId].length} projets)</span>
-          </div>
+          <Row align="middle">
+            <Col span={20}>
+              <Title level={4} style={{ margin: 0 }}>
+                {clientsProjects[clientId][0].clientId.nom} {clientsProjects[clientId][0].clientId.prenom}
+              </Title>
+              <Text>({clientsProjects[clientId].length} projets)</Text>
+            </Col>
+            <Col span={4} style={{ textAlign: 'right' }}>
+              <UserOutlined style={{ fontSize: 24 }} />
+            </Col>
+          </Row>
         }
         key={clientId}
+        style={{ marginBottom: 16 }}
       >
-        <p><strong>numero:</strong> {clientsProjects[clientId][0].clientId.numero}</p>
+        <Row gutter={16}>
+
+          <Col span={8}>
+            <Text strong>Numéro:</Text> <PhoneOutlined /> {clientsProjects[clientId][0].clientId.numero}
+          </Col>
+        </Row>
         <List
           grid={{ gutter: 16, column: 3 }}
           dataSource={clientsProjects[clientId]}
           renderItem={renderProjectCard}
+          style={{ marginTop: 16 }}
         />
       </Panel>
     ));
@@ -87,24 +102,28 @@ const AllPortfolios = () => {
 
   return (
     <Layout>
-      {/* GlobalStats component */}
-      <div className="card-header py-3" style={{ background: '#f0f0f0', padding: '16px 24px', marginBottom: 24 }}>
-        {/* Title component */}
-      </div>
+      <Card className="shadow mb-4">
+        <div className="card-header py-3">
+          <h6 className="m-0 font-weight-bold text-primary"> &#128194; Tous les Portfolios</h6>
+        </div>
+        <div className="card-body">
+          <div className="table-responsive">
 
-      <Collapse accordion>
-        {loading ? (
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Spin size="large" />
-          </div>
-        ) : error ? (
-          <Alert message={`Error: ${error}`} type="error" />
-        ) : (
-          renderClientProjects()
-        )}
-      </Collapse>
 
-      {/* Modal component */}
+            <Collapse accordion>
+              {loading ? (
+                <div style={{ textAlign: 'center', marginTop: 24 }}>
+                  <Spin size="large" />
+                </div>
+              ) : error ? (
+                <Alert message={`Erreur: ${error}`} type="error" />
+              ) : (
+                renderClientProjects()
+              )}
+            </Collapse>        </div>
+        </div>
+      </Card>
+
     </Layout>
   );
 };

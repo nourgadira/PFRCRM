@@ -86,6 +86,9 @@ const ViewPortfolio = () => {
     <Layout>
       <Card className="shadow mb-4">
         <div className="card-header py-3">
+          <h6 className="m-0 font-weight-bold text-primary"> &#128194; les projets de chaque client</h6>
+        </div>
+        <div className="card-header py-3">
           <div className="project-totals" style={{ display: 'flex', fontWeight: 'bold' }}>
             <div style={{ marginRight: '20px' }}>Total Projects: {totalProjects}</div>
             <div style={{ marginRight: '20px' }}>Active Projects: <Tag color="green">{activeProjects}</Tag></div>

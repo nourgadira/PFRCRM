@@ -96,7 +96,17 @@ const ModifierRendezvous = () => {
             <Form.Item name="etat" label="État">
               <Input />
             </Form.Item>
-
+            <Form.Item
+              name="status"
+              label="Status"
+              rules={[{ required: true, message: 'Veuillez sélectionner le status du rendez-vous' }]}
+            >
+              <Select style={{ width: '100%' }}>
+                <Option value="Annulé" style={{ color: 'red' }}>Annulé</Option>
+                <Option value="En cours" style={{ color: 'green' }}>En cours</Option>
+                <Option value="Fait" style={{ color: 'yellow' }}>Fait</Option>
+              </Select>
+            </Form.Item>
             <Form.Item style={{ textAlign: 'center' }}>
               <Button type="primary" htmlType="submit" loading={loading}>
                 Mettre à jour

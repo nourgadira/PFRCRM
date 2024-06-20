@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import "./index.css"
 import Clients from './Client/Clients';
 import CreateClients from './Client/CreateClients';
@@ -35,6 +35,7 @@ import Abonnment from './Abonnements/Abonnment';
 import CreateBudget from './Budgets/CreateBudget';
 import Risques from './Risques/Risques';
 import CreateRisque from './Risques/CreateRisque';
+import NotFoundPage from './NotFound/Notfound';
 
 import {
   QueryClient,
@@ -59,8 +60,9 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/CreateBudget/:projectId" element={<CreateBudget />} />
-          <Route path="/DetailsAvance/:projetId/:montantPaiement" element={<DetailsAvance />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Navigate to="/login" />} />          <Route path="/CreateBudget/:projectId" element={<CreateBudget />} />
+          <Route path="/details-avance/:projetId/:montantPaiement" element={<DetailsAvance />} />
 
           <Route path="/RequestVacation" element={<RequestVacation />} />
           <Route path="/MyVacations" element={<MyVacations />} />
@@ -75,7 +77,6 @@ root.render(
           <Route path="/CreateAbonnment/:clientId" element={<CreateAbonnment />} />
           <Route path="/Layout" element={<Layout />} />
           <Route path="/Tableauboard" element={<Tableauboard />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/Users" element={<Users />} />
           <Route path="/Create" element={<Create />} />
@@ -101,6 +102,7 @@ root.render(
           <Route path="/ModifierRendezvous/:id" element={<ModifierRendezvous />} /> {/* Route pour la modification avec un paramètre :id */}
           <Route path="/AjoutRendezvous" element={<AjoutRendezvous />} />
           <Route path="/Profile" element={<Profile />} /> {/* Ajoutez cette ligne */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

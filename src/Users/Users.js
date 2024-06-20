@@ -220,17 +220,15 @@ const Users = () => {
                   </Flex>
 
                   <div style={{ marginTop: 10 }}>
-                    <Rate value={employee.rating} onChange={(value) => handleUpdateRating(employee._id, value)} />
+                    {employee.role === 2 && <Rate value={employee.rating} onChange={(value) => handleUpdateRating(employee._id, value)} />}
                   </div>
-
-
 
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '15px' }}>
                     <Avatar src={employee?.image} style={{ width: 100, height: 100, marginBottom: '10px' }} />
                     <span style={{ fontWeight: '700', marginBottom: '5px' }}>{`${employee.prenom || ''} ${employee.name || ''}`}</span>
                     <span style={{ color: '#1890ff', marginBottom: '10px' }}>{employee.role ? $ROLES.find(role => role.key === employee.role)?.name || '' : ''}</span>
 
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap' }}>
                       <Button type="primary" icon={<EditOutlined />} onClick={() => onEdit(employee._id)}>
                         Modifier
                       </Button>
@@ -242,8 +240,8 @@ const Users = () => {
                   </div>
 
                 </Card>
-
               ))}
+
             </div>
           </div>
         </div>
@@ -310,7 +308,7 @@ const Users = () => {
               <p><strong>Role:</strong> {selectedUser.role}</p>
               <p><strong>Salaire Fixe:</strong> {selectedUser.salairefixe}</p>
               <p><strong>Prime:</strong> {selectedUser.prime}</p>
-              <p><strong>CIN:</strong> {selectedUser.CIN}</p>
+              <p><strong>CIN:</strong> {selectedUser.cin}</p>
               <p><strong>Téléphone:</strong> {selectedUser.telephone}</p>
             </div>
           </div>

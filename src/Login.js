@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from './lib/axios';
 import { Input, Button } from 'antd';
@@ -9,23 +9,28 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false); // État pour gérer l'affichage du mot de passe
+  const [active, setActive] = useState(true); // Définissez la valeur initiale selon vos besoins
+  const [userDeactivatedAlert, setUserDeactivatedAlert] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      setError(''); // Réinitialiser l'erreur à chaque tentative de connexion
+      setError('');
+      setLoginError('');
+      setUserDeactivatedAlert(false);
       const response = await axiosInstance.post('/login', { email, password });
-      // Si la connexion est réussie, enregistrer le token JWT dans localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data.id);
-      // Rediriger vers la page de mise en page après une connexion réussie
       navigate('/tableauboard');
     } catch (error) {
       console.error('Login failed:', error.response.data);
-      if (error.response.data === 'user deactivated') {
-        setError('User is deactivated. Please contact support.');
+      if (error.response.data === 'user desactived') {
+        setUserDeactivatedAlert(true);
+      } else if (error.response.data === 'user archived') {
+        setError('Login failed: user archived');
       } else if (error.response.data === 'user not found') {
         setError('User not found. Please check your email.');
       } else if (error.response.data === 'invalid password') {
@@ -56,6 +61,12 @@ const LoginForm = () => {
 
             <form onSubmit={handleLogin}>
               {error && <div className={`custom-alert error-alert fade-out`}>{error}</div>}
+              {loginError && <div className={`custom-alert error-alert fade-out`}>{loginError}</div>}
+              {userDeactivatedAlert && (
+                <div className={`custom-alert error-alert fade-out`}>
+                  User is deactivated. Please contact support.
+                </div>
+              )}
               <div className="login-field">
                 <Input
                   placeholder="Enter Email Address..."

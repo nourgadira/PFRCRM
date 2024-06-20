@@ -6,7 +6,6 @@ import Layout from '../Layout';
 import { UploadOutlined } from '@ant-design/icons';
 import { TableOutlined, AppstoreOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
-
 import { Button, DatePicker, Form, Input, Modal, Space, Table, Upload, message, Card, Select, Flex, Row, Col, Tag } from 'antd';
 import {
   EditOutlined, DeleteOutlined, UserOutlined, IdcardOutlined, SearchOutlined, FileOutlined, FileTextOutlined,
@@ -42,7 +41,8 @@ const GetAllProjet = ({ projetData, _id }) => {
     },
     select: (data) => decoded.role === 0 ? data : data.filter(p => p.chefProjet._id === decoded.id)
   });
-
+  const token = localStorage.getItem('token');
+  const userRole = decoded ? decoded.role : null;
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ id }) => {
       await axiosInstance.delete(`/projet/${id}/1`);
@@ -99,6 +99,19 @@ const GetAllProjet = ({ projetData, _id }) => {
   };
   const [projectId, setProjectId] = useState(/* valeur initiale de l'ID de projet */);
 
+  const calculateProjectsPerChef = (projets) => {
+    const projectsPerChef = {};
+    projets.forEach((project) => {
+      const chefId = project.chefProjet ? project.chefProjet._id : 'Unknown';
+      if (!projectsPerChef[chefId]) {
+        projectsPerChef[chefId] = 1; // Initialisation si le chef de projet n'est pas encore dans la liste
+      } else {
+        projectsPerChef[chefId]++; // Incrémentation du nombre de projets
+      }
+    });
+    return projectsPerChef;
+  };
+  const projectsPerChef = calculateProjectsPerChef(data || []);
 
   const columns = [
     {
@@ -219,10 +232,13 @@ const GetAllProjet = ({ projetData, _id }) => {
       key: 'chefProjet',
       render: (_, record) => {
         const chefProjet = record.chefProjet ? record.chefProjet.name : '';
+        const chefId = record.chefProjet ? record.chefProjet._id : 'Unknown';
+        const projectCount = projectsPerChef[chefId] || 0; // Nombre de projets pour ce chef de projet
         return (
           <span>
-            <UserOutlined style={{ marginRight: 8 }} /> {/* Icône avant le nom */}
+            <UserOutlined style={{ marginRight: 8 }} />
             {chefProjet}
+            {` (${projectCount} projets)`} {/* Affiche le nombre de projets */}
           </span>
         );
       },
@@ -251,17 +267,23 @@ const GetAllProjet = ({ projetData, _id }) => {
             >
               Archiver
             </Button>
-
-            <Button icon={<DollarOutlined />} onClick={() => handlePaymentClick(record._id)}>
-              Payer
-            </Button>
-
-
-            <Button icon={<DollarOutlined />} onClick={() => handleRisques(record._id)}>
-              risques
-            </Button>
+            {
+              userRole !== 2 && (
+                <Button
+                  icon={<DollarOutlined />}
+                  onClick={() => handlePaymentClick(record._id, record.status)} // Passez le statut du projet à la fonction
+                  disabled={record.status === 'Payé'} // Désactivez le bouton si le projet est déjà payé
+                >
+                  Payer
+                </Button>
+              )
+            }
+            {userRole !== 0 && (
+              <Button icon={<DollarOutlined />} onClick={() => handleRisques(record._id)}>
+                risques
+              </Button>
+            )}
           </Space>
-
 
         );
       },
@@ -282,21 +304,36 @@ const GetAllProjet = ({ projetData, _id }) => {
       message.error("Vous n'êtes pas autorisé à effectuer cette action.");
     }
   };
-
-  const handlePaymentClick = (id) => {
-    if (decoded.role === 0) {
+  const handlePaymentClick = (id, status) => {
+    if (status === 'Payé') { // Vérifiez le statut du projet
+      message.warning("Le paiement est déjà effectué.");
+    } else if (decoded.role === 0) {
       navigate(`/CreatePaiememnt/${id}`);
-    } else {
-      message.error("Vous n'êtes pas autorisé à effectuer cette action.");
     }
-  };
+  }
+
   const handleRisques = (id) => {
 
     navigate(`/CreateRisque/${id}`);
 
   };
 
+  const [projetState, setProjetState] = useState(null); // État local pour stocker l'état du projet
 
+  useEffect(() => {
+    const fetchProjetState = async () => {
+      try {
+        const response = await axios.get(`/projet/${_id}/check-finished`); // Faites une requête à la route pour vérifier l'état du projet
+        setProjetState(response.data.etat); // Mettez à jour l'état local avec la valeur de l'état du projet
+      } catch (error) {
+        console.error('Erreur lors de la récupération de l\'état du projet :', error);
+      }
+    };
+
+    if (_id) {
+      fetchProjetState(); // Appelez la fonction pour récupérer l'état du projet si l'ID du projet est disponible
+    }
+  }, [_id]);
 
   // operteur ternaire si vrai si
   const $DATA = !projetsList ? (
@@ -326,19 +363,21 @@ const GetAllProjet = ({ projetData, _id }) => {
       <div className="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 className="h3 mb-0 text-gray-800">LISTE DE PROJETS</h1>
       </div>
-      <Flex>
-        <Button onClick={() => tableau(!projetsList)}>
-          {projetsList ? <TableOutlined /> : <AppstoreOutlined />}
-        </Button>      </Flex>
-      <Form.Item>
-        <Input
-          placeholder="Rechercher"
-          style={{ width: '200px' }}
-          onChange={(e) => setText(e.target.value)}
-          prefix={<SearchOutlined style={{ color: 'blue' }} />} // Icône de recherche en bleu
-        />
+      <Flex style={{ gap: '20px' }}>
+        <Flex>
+          <Button onClick={() => tableau(!projetsList)}>
+            {projetsList ? <TableOutlined /> : <AppstoreOutlined />}
+          </Button>      </Flex>
+        <Form.Item>
+          <Input
+            placeholder="Rechercher"
+            style={{ width: '200px' }}
+            onChange={(e) => setText(e.target.value)}
+            prefix={<SearchOutlined style={{ color: 'blue' }} />} // Icône de recherche en bleu
+          />
 
-      </Form.Item>
+        </Form.Item>
+      </Flex>
       {/* displat table and grid */}
       {$DATA}
       {/* displat table and grid */}
@@ -359,10 +398,13 @@ const GetAllProjet = ({ projetData, _id }) => {
           <Form.Item label="Description" name="description" rules={[{ required: true, message: 'Veuillez saisir une description' }]}>
             <Input suffix={<FileTextOutlined />} />
           </Form.Item>
+          <div style={{ marginBottom: '8px' }}>Date de début</div>
           <Input
             suffix={<CalendarOutlined />}
             value={form.getFieldValue('dateDebut') ? new Date(form.getFieldValue('dateDebut')).toISOString().split('T')[0] : ''}
           />
+          <div style={{ marginBottom: '8px' }}>Date Fin</div>
+
           <Input
             suffix={<CalendarOutlined />}
             value={form.getFieldValue('dateFin') ? new Date(form.getFieldValue('dateFin')).toISOString().split('T')[0] : ''}
@@ -371,6 +413,7 @@ const GetAllProjet = ({ projetData, _id }) => {
           <Form.Item label="Coût Projet" name="coutProjet" rules={[{ required: true, message: 'Veuillez saisir une coût projet' }]}>
             <Input suffix={<DollarOutlined />} />
           </Form.Item>
+          <div style={{ marginBottom: '8px' }}>Date de hebergement </div>
 
           <Input
             suffix={<CalendarOutlined />}

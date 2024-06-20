@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, message, Tag } from 'antd';
+import { Table, Button, message, Modal, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../Layout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -7,11 +7,13 @@ import { axiosInstance } from '../lib/axios';
 import moment from 'moment';
 import { Card } from 'antd';
 import dayjs from 'dayjs';
-import { useMutation } from '@tanstack/react-query';
 
 const AllRendezvous = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [cancelRendezvousId, setCancelRendezvousId] = useState(null);
 
   const { data: rendezvous, isLoading } = useQuery({
     queryKey: ["rendezvous"],
@@ -23,44 +25,109 @@ const AllRendezvous = () => {
 
   const today = moment().startOf('day');
 
-  const annulerRendezvous = async (id) => {
-    setLoading(true);
-    try {
-      await axiosInstance.delete(`/rendezvous/${id}`);
-      queryClient.invalidateQueries('rendezvous');
-      message.success('Rendez-vous annulé avec succès');
-    } catch (error) {
-      message.error('Erreur lors de l\'annulation du rendez-vous');
-    } finally {
-      setLoading(false);
-    }
+  const handleCancelRendezvous = (rendezvousId) => {
+    setCancelRendezvousId(rendezvousId);
+    setConfirmModalVisible(true);
   };
-  const [loading, setLoading] = useState(false);
+
+  const confirmCancelRendezvous = async () => {
+    try {
+      await axiosInstance.put(`/rendezvous/${cancelRendezvousId}/cancel`, { status: 'cancelled' });
+      message.success('Rendez-vous annulé avec succès.');
+      queryClient.invalidateQueries(["rendezvous"]);
+    } catch (error) {
+      message.error('Erreur lors de l\'annulation du rendez-vous.');
+    }
+    setConfirmModalVisible(false);
+  };
+
+  const cancelConfirmCancelRendezvous = () => {
+    setConfirmModalVisible(false);
+  };
+
+  const getStatusTag = (status, dateFin) => {
+    if (!status) {
+      return null;
+    }
+
+    let color = '';
+    switch (status) {
+
+      case 'En cours':
+        color = '#52c41a'; // Vert
+        break;
+      case 'cancelled':
+        color = '#f5222d'; // Rouge
+        break;
+      case 'À Fait':
+        color = '#fadb14'; // Jaune
+        break;
+      default:
+        color = '#d9d9d9'; // Gris par défaut pour les statuts non définis
+        break;
+    }
+
+    const daysOverdue = getDaysOverdue(dateFin);
+    const statusText = daysOverdue > 0 ? `${status.toUpperCase()} (${daysOverdue} jours de retard)` : status.toUpperCase();
+
+    return <Tag color={color}>{statusText}</Tag>;
+  };
+
+  const getDaysOverdue = (dateFin) => {
+    const endDate = moment(dateFin);
+    const daysDiff = endDate.diff(today, 'days');
+    return daysDiff;
+  };
 
   const columns = [
     {
-      title: 'Date and Time',
+      title: 'Date et Heure',
       dataIndex: 'dateHeure',
       key: 'dateHeure',
       render: (text, record) => (
         <span>{dayjs(record.dateHeure).format('YYYY-MM-DD')}</span>
       ),
     },
-    { title: 'Type', dataIndex: 'type', key: 'type' },
-    { title: 'Location', dataIndex: 'lieu', key: 'lieu' },
-    { title: 'Etat Client', dataIndex: 'etat', key: 'etat' },
-    { title: 'Nom Client', dataIndex: 'nomclient', key: 'nomclient' },
-    { title: 'Prenom Client', dataIndex: 'prenomclient', key: 'prenomclient' },
-    { title: 'Notes', dataIndex: 'notes', key: 'notes' },
     {
-      title: 'Etat',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Tag color={status === 'cancelled' ? 'red' : 'green'}>
-          {status === 'cancelled' ? 'Cancelled' : 'Active'}
-        </Tag>
-      ),
+      render: (text, record) => getStatusTag(record.status, record.dateFin),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+    },
+    {
+      title: 'Langue',
+      dataIndex: 'langue',
+      key: 'langue',
+    },
+    {
+      title: 'Notes',
+      dataIndex: 'notes',
+      key: 'notes',
+    },
+    {
+      title: 'Nom Client',
+      dataIndex: 'nomclient',
+      key: 'nomclient',
+    },
+    {
+      title: 'Prénom Client',
+      dataIndex: 'prenomclient',
+      key: 'prenomclient',
+    },
+    {
+      title: 'Lieu',
+      dataIndex: 'lieu',
+      key: 'lieu',
+    },
+    {
+      title: 'État',
+      dataIndex: 'etat',
+      key: 'etat',
     },
     {
       title: 'Actions',
@@ -68,25 +135,12 @@ const AllRendezvous = () => {
       render: (text, record) => (
         <span>
           <Link to={`/ModifierRendezvous/${record._id}`}>Modifier</Link>
-          {record.status === 'cancelled' ? (
-            <Button type="link" disabled style={{ color: 'red' }}>
-              Annuler
-            </Button>
-          ) : (
-            <Button
-              type="link"
-              onClick={() => annulerRendezvous(record._id)}
-              style={{ color: 'red' }}
-            >
-              Annuler
-            </Button>
-          )}
+          <Button type="link" onClick={() => handleCancelRendezvous(record._id)}>Annuler</Button>
         </span>
       ),
     },
   ];
 
-  // Filtrer les rendez-vous passés
   const rendezvousFuturs = rendezvous?.filter(rendezvous => moment(rendezvous.dateHeure).isAfter(today));
 
   return (
@@ -101,6 +155,14 @@ const AllRendezvous = () => {
           </div>
         </div>
       </Card>
+      <Modal
+        title="Confirmer l'annulation"
+        visible={confirmModalVisible}
+        onOk={confirmCancelRendezvous}
+        onCancel={cancelConfirmCancelRendezvous}
+      >
+        Êtes-vous sûr de vouloir annuler ce rendez-vous ?
+      </Modal>
     </Layout>
   );
 };
