@@ -15,6 +15,7 @@ const CreateRendezvous = () => {
     try {
       const response = await axiosInstance.post("/rendezvous", {
         dateHeure: values.dateRendezvous,
+        status: values.status,
         lieu: values.lieu,
         type: values.type,
         etat: values.etat,
@@ -116,11 +117,11 @@ const CreateRendezvous = () => {
               </Select>
             </Form.Item>
             <Form.Item
-              label="Status"
-              name="Status"
-              rules={[{ required: true, message: 'Veuillez saisirStatus' }]}
+              label="status"
+              name="status"
+              rules={[{ required: true, message: 'Veuillez saisirstatus' }]}
             >
-              <Select placeholder="Sélectionnez le Status du rendezvous">
+              <Select placeholder="Sélectionnez le status du rendezvous">
                 <Option value="À venir">À Fait</Option>
                 <Option value="En cours">En cours</Option>
 

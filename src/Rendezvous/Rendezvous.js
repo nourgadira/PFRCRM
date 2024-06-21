@@ -69,16 +69,13 @@ const AllRendezvous = () => {
 
     const daysOverdue = getDaysOverdue(dateFin);
     const statusText = daysOverdue > 0 ? `${status.toUpperCase()} (${daysOverdue} jours de retard)` : status.toUpperCase();
-
     return <Tag color={color}>{statusText}</Tag>;
   };
-
   const getDaysOverdue = (dateFin) => {
     const endDate = moment(dateFin);
     const daysDiff = endDate.diff(today, 'days');
     return daysDiff;
   };
-
   const columns = [
     {
       title: 'Date et Heure',

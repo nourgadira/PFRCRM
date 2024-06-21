@@ -90,21 +90,26 @@ const ModifierRendezvous = () => {
             >
               <Input />
             </Form.Item>
-            <Form.Item name="lieu" label="Lieu">
-              <Input />
-            </Form.Item>
-            <Form.Item name="etat" label="État">
-              <Input />
+
+            <Form.Item
+              label="État du client"
+              name="etat"
+              rules={[{ required: true, message: 'Veuillez saisir un état' }]}
+            >
+              <Select placeholder="Sélectionnez l'état du client">
+                <Option value="nouveau">joiniabale</Option>
+                <Option value="prospecter">non joiniabale</Option>
+              </Select>
             </Form.Item>
             <Form.Item
+              label="status"
               name="status"
-              label="Status"
-              rules={[{ required: true, message: 'Veuillez sélectionner le status du rendez-vous' }]}
+              rules={[{ required: true, message: 'Veuillez saisirstatus' }]}
             >
-              <Select style={{ width: '100%' }}>
-                <Option value="Annulé" style={{ color: 'red' }}>Annulé</Option>
-                <Option value="En cours" style={{ color: 'green' }}>En cours</Option>
-                <Option value="Fait" style={{ color: 'yellow' }}>Fait</Option>
+              <Select placeholder="Sélectionnez le status du rendezvous">
+                <Option value="À venir">À Fait</Option>
+                <Option value="En cours">En cours</Option>
+
               </Select>
             </Form.Item>
             <Form.Item style={{ textAlign: 'center' }}>

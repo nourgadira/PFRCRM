@@ -4,7 +4,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import "./index.css"
 import Clients from './Client/Clients';
 import CreateClients from './Client/CreateClients';
-import EditClients from './Client/EditClients';
 import Layout from './Layout';
 import Login from './Login';
 
@@ -85,7 +84,6 @@ root.render(
           <Route path="/ProjetsArchive" element={<ProjetsArchive />} />
           <Route path="/Clients" element={<Clients />} />
           <Route path="/CreateClient" element={<CreateClients />} />
-          <Route path="/EditClients/:clientId" element={<EditClients />} />
           <Route path="/fetchNotifications" element={<fetchNotifications />} />
           <Route path="/AllPortflios" element={<AllPortflios />} />
           <Route path="/RendezvousPasses" element={<RendezvousPasses />} /> {/* Ajoutez cette ligne */}

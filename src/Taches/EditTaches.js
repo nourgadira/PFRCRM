@@ -1,155 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react';
+import { Card, Form, Input, Select, Button, Avatar, Typography, Row, Col, Space, DatePicker } from 'antd';
+import { FolderAddOutlined, AlignLeftOutlined } from '@ant-design/icons';
 import Layout from '../Layout';
-import { Button, Form, Input, Select, Card, Avatar, Flex, Typography } from "antd";
-import { FolderAddOutlined, CalendarOutlined } from '@ant-design/icons';
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { status } from '../data/selecteurs';
-import { decodeToken } from '../lib/jwt'
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { decodeToken } from '../lib/jwt';
 import { axiosInstance } from '../lib/axios';
 import { useParams, useNavigate } from 'react-router-dom';
-const UpdateTask = ({ setOpen }) => {
+import { status as taskStatus } from '../data/selecteurs';
+import dayjs from 'dayjs';
+
+const { TextArea } = Input;
+
+const UpdateTask = () => {
   const { id } = useParams();
-  const [form] = Form.useForm()
-  const queryClient = useQueryClient()
+  const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const decoded = decodeToken(localStorage.getItem("token"))
+  const decoded = decodeToken(localStorage.getItem("token"));
+
   const { data: taskData, isLoading: taskLoading } = useQuery({
     queryKey: ['task', id],
     queryFn: async () => {
       const response = await axiosInstance.get(`/tasks/${id}`);
-      form.setFieldsValue(response.data);
-      return response.data
-    },
-  })
-
-  const { data: projets, isLoading: projetsLoading } = useQuery({
-    queryKey: ['projets'],
-    queryFn: async () => {
-      const response = await axiosInstance.get('/projets');
-      return response.data.projets
-    },
-  })
+      const task = response.data;
+      task.dateDebut = task.dateDebut ? dayjs(task.dateDebut) : null;
+      task.dateFin = task.dateFin ? dayjs(task.dateFin) : null;
+      form.setFieldsValue(task);
+      return task;
+    }
+  });
 
   const { data: developpeurs, isLoading: developpeursLoading } = useQuery({
     queryKey: ['developpeurs'],
     queryFn: async () => {
       const response = await axiosInstance.get('/users');
-      return response.data.filter(d => d.role === 1).flatMap((d) => ({
-        label: <Flex align="center" gap={4}><Avatar src={d.image} style={{ width: "50px", height: "50px" }} /><Typography.Title level={5}>{d.name}</Typography.Title></Flex>,
-        value: d._id
-      }));
-    },
-  })
+      return response.data
+        .filter(d => d.role === 1)
+        .map(d => ({
+          label: (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Avatar src={d.image} />
+              <Typography.Text>{d.name}</Typography.Text>
+            </div>
+          ),
+          value: d._id,
+        }));
+    }
+  });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async ({ data }) => {
-      const updateData = { ...data };
-      await axiosInstance.patch(`/tasks/${id}`, updateData)
-      navigate(`/projets/${updateData.projet._id}/taches`); // Navigation vers l'URL souhaitée après la soumission du formulaire
+  const mutation = useMutation({
+    mutationFn: async (values) => {
+      const updateData = { ...values };
+      await axiosInstance.patch(`/tasks/${id}`, updateData);
+      return updateData;
     },
-  })
+    onSuccess: (data) => {
+      if (data.projet && data.projet._id) {
+        navigate(`/projets/${data.projet._id}/taches`);
+      } else {
+        console.error('Project ID is undefined:', data);
+      }
+    }
+  });
+
+  const onFinish = (values) => {
+    mutation.mutate(values);
+  };
+
   return (
     <Layout>
-      <Card title={<><FolderAddOutlined /> Modifier une tâche</>} className="mb-4">
-        <Form layout='vertical' form={form} onFinish={(values) => mutate({ data: values })} className="custom-form">
-          {/* Projet */}
-
-          {/* État */}
-          {(decoded.role === 1 || decoded.role === 2) && (
-            <Form.Item
-              label="État"
-              name="etat"
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez saisir un état',
-                },
-              ]}
-            >
-              <Select options={status} />
-            </Form.Item>
-          )}
-
-          {/* Nom */}
-          {(decoded.role === 2) && (
-            <Form.Item
-              label="Nom"
-              name="nom"
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez saisir un nom',
-                },
-              ]}
-            >
-              <Input suffix={<i className="fas fa-align-left" />} />
-            </Form.Item>
-          )}
-          {(decoded.role === 1) && (
-            <Form.Item
-              label="desciption"
-              name="desciption"
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez saisir un desciption',
-                },
-              ]}
-            >
-              <Input suffix={<i className="fas fa-align-left" />} />
-            </Form.Item>
-          )}
-          <Input
-            suffix={<CalendarOutlined />}
-            value={form.getFieldValue('dateDebut') ? new Date(form.getFieldValue('dateDebut')).toISOString().split('T')[0] : ''}
-          />
-          <Input
-            suffix={<CalendarOutlined />}
-            value={form.getFieldValue('dateFin') ? new Date(form.getFieldValue('dateFin')).toISOString().split('T')[0] : ''}
-          />
-          {/* Description */}
-          {(decoded.role === 2) && (
-            <Form.Item
-              label="Description"
-              name="description"
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez saisir une description',
-                },
-              ]}
-            >
-              <Input.TextArea suffix={<i className="fas fa-align-left" />} />
-            </Form.Item>
-          )}
-
-          {/* Développeur */}
-          {(decoded.role === 2) && (
-            <Form.Item
-              label="Développeur"
-              name="developpeur"
-              rules={[
-                {
-                  required: true,
-                  message: 'Veuillez sélectionner un développeur',
-                },
-              ]}
-            >
-              <Select
-                options={developpeurs}
-                allowClear
-                loading={developpeursLoading}
-              />
-            </Form.Item>
-          )}
-
-          <Button htmlType='submit' type='primary' icon={<FolderAddOutlined />}>Modifier la tâche</Button>
+      <Card
+        title={<><FolderAddOutlined /> Modifier une tâche</>}
+        className="mb-4"
+        bordered={false}
+        style={{ borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
+      >
+        <Form form={form} onFinish={onFinish} layout="vertical" className="custom-form">
+          <Row gutter={[16, 16]}>
+            {decoded.role === 2 && (
+              <>
+                <Col span={12}>
+                  <Form.Item
+                    label="Nom"
+                    name="nom"
+                    rules={[{ required: true, message: 'Veuillez saisir un nom' }]}
+                  >
+                    <Input prefix={<AlignLeftOutlined />} placeholder="Nom de la tâche" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Description"
+                    name="description"
+                    rules={[{ required: true, message: 'Veuillez saisir une description' }]}
+                  >
+                    <TextArea rows={4} placeholder="Description de la tâche" />
+                  </Form.Item>
+                </Col>
+              </>
+            )}
+            {decoded.role === 1 && (
+              <Col span={24}>
+                <Form.Item
+                  label="Description"
+                  name="description"
+                  rules={[{ required: true, message: 'Veuillez saisir une description' }]}
+                >
+                  <TextArea rows={4} placeholder="Description de la tâche" />
+                </Form.Item>
+              </Col>
+            )}
+            {decoded.role === 2 && (
+              <Col span={12}>
+                <Form.Item
+                  label="État"
+                  name="etat"
+                  rules={[{ required: true, message: 'Veuillez saisir un état' }]}
+                >
+                  <Select options={taskStatus} placeholder="Sélectionner un état" />
+                </Form.Item>
+              </Col>
+            )}
+            <Col span={12}>
+              <Form.Item
+                label="Date Début"
+                name="dateDebut"
+                rules={[{ required: true, message: 'Veuillez saisir une date de début' }]}
+              >
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                  placeholder="Date de début"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Date Fin"
+                name="dateFin"
+                rules={[{ required: true, message: 'Veuillez saisir une date de fin' }]}
+              >
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                  placeholder="Date de fin"
+                />
+              </Form.Item>
+            </Col>
+            {decoded.role === 2 && (
+              <Col span={24}>
+                <Form.Item
+                  label="Développeur"
+                  name="developpeur"
+                  rules={[{ required: true, message: 'Veuillez sélectionner un développeur' }]}
+                >
+                  <Select
+                    options={developpeurs}
+                    allowClear
+                    loading={developpeursLoading}
+                    placeholder="Sélectionner un développeur"
+                  />
+                </Form.Item>
+              </Col>
+            )}
+          </Row>
+          <Form.Item>
+            <Space style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<FolderAddOutlined />}
+                loading={mutation.isLoading}
+                size="large"
+                style={{ borderRadius: '5px', padding: '0 30px' }}
+              >
+                Modifier la tâche
+              </Button>
+            </Space>
+          </Form.Item>
         </Form>
       </Card>
-    </Layout >
+    </Layout>
   );
 };
 

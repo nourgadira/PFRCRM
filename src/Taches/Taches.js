@@ -48,17 +48,25 @@ const GetAllT = () => {
     );
     setFilteredTasks(filtered);
   }, [searchText, tasks]);
+  const getTagColor = (status, dateFin) => {
+    const currentDate = dayjs();
+    const endDate = dayjs(dateFin);
+    const daysDiff = endDate.diff(currentDate, 'day');
 
-  const getStatusColor = (task) => {
-    if (task.etat === "done") {
-      return "lightgreen";
-    } else if (task.etat === "INPROGRESS") {
-      return "lightyellow";
-    } else if (dayjs(task.dateFin).isBefore(dayjs())) {
-      return "lightcoral";
+    if (endDate.isBefore(currentDate, 'day')) {
+      return { color: '#f5222d', label: `${Math.abs(daysDiff)} jour(s) en retard` };
+    } else {
+      switch (status) {
+        case 'done':
+          return { color: '#52c41a', label: 'Terminé' };
+        case 'In Progress':
+          return { color: '#fadb14', label: 'En cours' };
+        default:
+          return { color: '#d9d9d9', label: 'todo' };
+      }
     }
-    return "";
   };
+
 
   const ModalCreateTask = () => (
     <Modal
@@ -168,17 +176,13 @@ const GetAllT = () => {
       dataIndex: 'etat',
       key: 'etat',
       sorter: (a, b) => a.etat.localeCompare(b.etat),
-      render: (etat) => {
-        let color;
-        switch (etat) {
-          case "TODO": color = "green"; break;
-          case "INPROGRESS": color = "blue"; break;
-          case "done": color = "volcano"; break;
-          default: color = "default";
-        }
-        return <Tag color={color}>{etat}</Tag>;
+      render: (etat, record) => {
+        const { color, label } = getTagColor(etat, record.dateFin);
+        return <Tag color={color}>{label}</Tag>;
       },
     },
+
+
     {
       title: 'Description',
       dataIndex: 'description',
@@ -245,7 +249,7 @@ const GetAllT = () => {
           <Table
             columns={columns}
             dataSource={filteredTasks.map(task => ({ ...task, key: task._id }))}
-            rowClassName={(record) => getStatusColor(record)}
+            rowClassName={(record) => getTagColor(record)}
             pagination={false}
             className="table-responsive"
           />

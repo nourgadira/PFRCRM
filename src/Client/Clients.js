@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../Layout';
-import { Button, Card, Drawer, Form, Input, message, Modal, Avatar } from 'antd';
+import { Button, Card, Drawer, Form, Input, message, Modal, Avatar, Select } from 'antd';
 import { DollarCircleOutlined, ProjectOutlined, CheckCircleOutlined, DeleteOutlined, EditOutlined, CalendarOutlined, EnvironmentOutlined, FileOutlined, FileAddOutlined, IdcardOutlined, MessageOutlined, PhoneOutlined, PlusOutlined, SaveOutlined, SolutionOutlined, UserOutlined } from '@ant-design/icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPermissions } from '../helpers/helpers';
 import { axiosInstance } from '../lib/axios';
 import { decodeToken } from '../lib/jwt';
 import CreateProjet from '../Projets/CreateProjets';
-
 const AllClient = () => {
     const [open, setOpen] = useState(false);
     const [openProject, setOpenProject] = useState({
@@ -16,6 +15,7 @@ const AllClient = () => {
         open: false
     });
     const [client, setClients] = useState([]);
+    const { Option } = Select;
 
     const navigate = useNavigate(); // Utilisez useNavigate pour la navigation
 
@@ -34,7 +34,6 @@ const AllClient = () => {
             return response.data;
         }
     });
-
     const OpenEditModal = (id) => {
         form.resetFields();
         form.setFieldsValue(clients.find((client) => client._id === id));
@@ -195,7 +194,11 @@ const AllClient = () => {
                         <Input suffix={<PhoneOutlined />} />
                     </Form.Item>
                     <Form.Item label="État" name="etat" rules={[{ required: true, message: 'Veuillez saisir un état' }]}>
-                        <Input suffix={<CheckCircleOutlined />} />
+                        <Select placeholder="Sélectionner un état" suffixIcon={<CheckCircleOutlined />}>
+                            <Option value="actif">Actif</Option>
+                            <Option value="À prospecter">À prospecter</Option>
+                            <Option value="suspendu">Suspendu</Option>
+                        </Select>
                     </Form.Item>
                     <Form.Item label="Notes" name="notes" rules={[{ required: true, message: 'Veuillez saisir des notes' }]}>
                         <Input.TextArea suffix={<MessageOutlined />} disabled />

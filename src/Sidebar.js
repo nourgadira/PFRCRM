@@ -91,12 +91,8 @@ function Sidebar() {
           <div id="collapseTasks" className="collapse" aria-labelledby="headingTasks" data-parent="#accordionSidebar"></div>
         </li>
       )}
-
-
-
       {/* Divider */}
       <hr className="sidebar-divider d-none d-md-block" />
-
       {/* Additional Sidebar Items */}
       {role === 0 && (
         <li className="nav-item">

@@ -11,7 +11,6 @@ const AjoutC = () => {
   const [clientData, setClientData] = useState({
     nom: '',
     prenom: '',
-    prenom: '',
     numero: '',
     etat: '',
     notes: '',
@@ -78,9 +77,8 @@ const AjoutC = () => {
                 <Form.Item label="prenom :" name="prenom" rules={[{ required: true, message: 'Veuillez saisir un prenom' }]}>
                   <Input name="prenom" suffix={<UserOutlined />} />
                 </Form.Item>
-                <Form.Item label="prenom :" name="prenom" rules={[{ required: true, message: 'Veuillez saisir un prenom' }]}>
-                  <Input name="prenom" suffix={<UserOutlined />} />
-                </Form.Item>
+
+
                 <Form.Item
                   label="Numéro :"
                   name="numero"
