@@ -7,10 +7,7 @@ import CreateClients from './Client/CreateClients';
 import EditClients from './Client/EditClients';
 import Layout from './Layout';
 import Login from './Login';
-import RequestVacation from './Conge/RequestVacation';
-import MyVacations from './Conge/MyVacations';
-import VacationRequestlist from './Conge/VacationRequestlist';
-import ReviewOfVacations from './Conge/ReviewOfVacations';
+
 import ViewPortfolio from './Portflio/ViewPortfolio';
 import CreateProjets from './Projets/CreateProjets';
 import Projets from './Projets/Projets';
@@ -64,10 +61,7 @@ root.render(
           <Route path="/" element={<Navigate to="/login" />} />          <Route path="/CreateBudget/:projectId" element={<CreateBudget />} />
           <Route path="/details-avance/:projetId/:montantPaiement" element={<DetailsAvance />} />
 
-          <Route path="/RequestVacation" element={<RequestVacation />} />
-          <Route path="/MyVacations" element={<MyVacations />} />
-          <Route path="/VacationRequestlist" element={<VacationRequestlist />} />
-          <Route path="/ReviewOfVacations" element={<ReviewOfVacations />} />
+
           <Route path="/Risques" element={<Risques />} />
           <Route path="/CreateRisque/:id" element={<CreateRisque />} />
 

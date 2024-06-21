@@ -92,31 +92,7 @@ function Sidebar() {
         </li>
       )}
 
-      {(role === 1 || role === 2 || role === 3) && (
-        <li className="nav-item">
-          <a
-            className="nav-link collapsed"
-            href="#"
-            data-toggle="collapse"
-            data-target="#collapseVacations"
-            aria-expanded="true"
-            aria-controls="collapseVacations"
-          >
-            <i className="fas fa-fw fa-suitcase"></i>
-            <span>Vacations</span>
-          </a>
 
-          {/* Collapsible Content - List of Vacation Requests (Visible for role === 0) */}
-          <div id="collapseVacations" className="collapse" aria-labelledby="headingVacations" data-parent="#accordionSidebar">
-            <div className="bg-white py-2 collapse-inner rounded">
-              {/* Link to Request for a Vacation */}
-              <Link className="collapse-item" to="/RequestVacation">Request for a Vacation</Link>
-              {/* Link to My Vacations */}
-              <Link className="collapse-item" to="/MyVacations">My Vacations</Link>
-            </div>
-          </div>
-        </li>
-      )}
 
       {/* Divider */}
       <hr className="sidebar-divider d-none d-md-block" />
